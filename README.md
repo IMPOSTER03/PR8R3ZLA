@@ -12,7 +12,7 @@ Unlike other compression methods that may compromise the quality or integrity of
 To install this project, follow these steps:
 
 1. Clone the repository.
-2. Run `git clone "link"` in your terminal.
+2. Run `git clone https://github.com/IMPOSTER03/PR8R3ZLA.git` in your terminal.
 
 ## Usage
 Using our compression website is simple and user-friendly:
