@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="'en">
+
+<head>
+    <title>Compression SOI</title>
+    <style>
+        /* CSS styles go here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 22px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Image and Text Compression</h1>
+    </header>
+
+    <main>
+        <!-- <p>Sign in to your account:</p>
+
+        <div>
+            <label for="userId">User ID</label>
+            <input type="text" id="userId" name="userId">
+        </div> -->
+        <form id="imageForm" enctype="multipart/form-data">
+            <h2>Image Compression</h2>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+            <button type="submit" id="imageCompressBtn">Compress Image</button>
+        </form>
+
+        <form id="textForm" enctype="multipart/form-data">
+            <h2>Text Compression</h2>
+            
+            <input type="file" id="textFile" name="textFile" accept=".txt" required>
+            <!-- <a href="anagrams.txt" show>show text</a> -->
+            <button type="submit" id="textCompressBtn">Compress Text</button>
+        </form>
+
+        <div id="result">
+            <!-- The compression result will be displayed here -->
+        </div>
+    </main>
+
+    <script>
+        // JavaScript code for handling form submission and compression
+        document.getElementById("imageForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var fileInput = document.getElementById("imageFile");
+            if (fileInput.files.length === 0) {
+                return;
+            }
+            var file = fileInput.files[0];
+
+            // Perform image compression using appropriate compression algorithm
+
+
+
+            // Display the compression result in the result div
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Image compressed successfully!";
+        });
+
+        document.getElementById("textForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var fileInput = document.getElementById("textFile");
+            if (fileInput.files.length === 0) {
+                return;
+            }
+            var file = fileInput.files[0];
+
+            // Perform text compression using appropriate compression algorithm
+
+            // Display the compression result in the result div
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Text compressed successfully!";
+        });
+    </script>
+    &lt;&lt;&lt;&copy;ImTex&gt;&gt;&gt;
+</body>
+
+</html>
