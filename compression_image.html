@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Image Compression</title>
+</head>
+
+<body>
+  <h1>Image Compression</h1>
+
+  <input type="file" id="input-image" accept="image/*">
+  <button id="compress-button">Compress Image</button>
+  <canvas id="canvas"></canvas>
+  <div class="compression-bar">
+    <div class="compression-fill" id="compression-fill"></div>
+  </div>
+  <p id="compression-percentage"></p>
+  <p id="compression-success"></p>
+
+  <style>
+    h1{
+      color:white;
+      text-align: center;
+      text-decoration: solid;
+      font-size: 45px;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .compression-bar {
+      width: 300px;
+      height: 20px;
+      background-color:#eee;
+      margin-top: 20px;
+    }
+
+    .compression-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+    }
+
+    #compression-percentage,
+    #compression-success {
+      margin-top: 20px;
+      text-align: center;
+      color:#eee;
+    }
+
+    .video-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .video-background video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #canvas {
+      display: block;
+      margin: 0 auto;
+      max-width: 20%;
+      max-height: 20%;
+    }
+  </style>
+
+  <div class="video-background">
+    <video src="153957 (1440p) (1).mp4" loop autoplay muted playsinline></video>
+  </div>
+
+  <script>
+    class HuffmanEncoder {
+      constructor() {
+        this.frequencyTable = {};
+        this.huffmanCodes = {};
+        this.huffmanTreeRoot = null;
+        this.encodedData = '';
+      }
+
+      // Step 1: Calculate frequency of occurrence for each pixel value
+      calculateFrequencies(pixelData) {
+        for (let i = 0; i < pixelData.length; i++) {
+          const pixel = pixelData[i];
+          if (this.frequencyTable[pixel]) {
+            this.frequencyTable[pixel]++;
+          } else {
+            this.frequencyTable[pixel] = 1;
+          }
+        }
+      }
+
+      // Step 2: Build the Huffman tree
+      buildTree() {
+        const nodes = [];
+
+        // Create leaf nodes for each pixel value and add them to the nodes array
+        for (const value in this.frequencyTable) {
+          const node = { value, frequency: this.frequencyTable[value], left: null, right: null };
+          nodes.push(node);
+        }
+
+        // Build the Huffman tree by combining nodes with the lowest frequency until a single root node is left
+        while (nodes.length > 1) {
+          // Sort the nodes array in ascending order based on frequency
+          nodes.sort((a, b) => a.frequency - b.frequency);
+
+          // Take the two nodes with the lowest frequency
+          const leftNode = nodes.shift();
+          const rightNode = nodes.shift();
+
+          // Create a new parent node with combined frequency and the two child nodes
+          const parentNode = {
+            value: null,
+            frequency: leftNode.frequency + rightNode.frequency,
+            left: leftNode,
+            right: rightNode,
+          };
+
+          // Add the parent node back to the nodes array
+          nodes.push(parentNode);
+        }
+
+        // Set the root of the Huffman tree as the single node left in the nodes array
+        this.huffmanTreeRoot = nodes[0];
+      }
+
+      // Step 3: Generate Huffman codes
+      generateCodes() {
+        // Recursive function to traverse the Huffman tree and generate codes
+        const traverse = function (node, currentCode) {
+          if (node.left === null && node.right === null) {
+            // Leaf node, assign the code to the pixel value
+            this.huffmanCodes[node.value] = currentCode;
+          } else {
+            // Non-leaf node, recursively traverse left and right branches
+            traverse.call(this, node.left, currentCode + '0');
+            traverse.call(this, node.right, currentCode + '1');
+          }
+        };
+
+        // Start the recursive traversal from the root of the Huffman tree
+        traverse.call(this, this.huffmanTreeRoot, '');
+      }
+
+      // Step 4: Encode the pixel data
+      encode(pixelData) {
+        // Generate the Huffman codes if not already generated
+        if (Object.keys(this.huffmanCodes).length === 0) {
+          this.buildTree();
+          this.generateCodes();
+        }
+
+        // Encode the pixel data using the generated Huffman codes
+        this.encodedData = '';
+        for (let i = 0; i < pixelData.length; i++) {
+          const pixel = pixelData[i];
+          this.encodedData += this.huffmanCodes[pixel];
+        }
+
+        return this.encodedData;
+      }
+
+      // Step 6: Decode the encoded data
+      decode(encodedData) {
+        let decodedData = '';
+        let currentNode = this.huffmanTreeRoot;
+
+        // Traverse the encoded data and decode pixel values
+        for (let i = 0; i < encodedData.length; i++) {
+          const bit = encodedData[i];
+          if (bit === '0') {
+            currentNode = currentNode.left;
+          } else if (bit === '1') {
+            currentNode = currentNode.right;
+          }
+
+          if (currentNode.left === null && currentNode.right === null) {
+            // Leaf node, found a decoded pixel value
+            decodedData += currentNode.value;
+            currentNode = this.huffmanTreeRoot; // Reset to the root for the next pixel
+          }
+        }
+
+        return decodedData;
+      }
+
+      // Calculate the compression percentage
+      calculateCompressionPercentage(pixelData, encodedData) {
+        const originalSize = pixelData.length * 8; // Each pixel value is 8 bits (1 byte)
+        const compressedSize = encodedData.length;
+        const percentage = ((originalSize - compressedSize) / originalSize) * 100;
+        return percentage.toFixed(2);
+      }
+    }
+
+    function compressImage() {
+      const inputImage = document.getElementById('input-image');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const compressionFill = document.getElementById('compression-fill');
+      const compressionPercentage = document.getElementById('compression-percentage');
+      const compressionSuccess = document.getElementById('compression-success');
+
+      const file = inputImage.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const image = new Image();
+
+        image.onload = () => {
+          const MAX_SIZE = 1000;
+          let width = image.width;
+          let height = image.height;
+
+         if (width > height) {
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width;
+              width = MAX_SIZE;
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height;
+              height = MAX_SIZE;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(image, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const pixelData = Array.from(imageData.data);
+
+          const huffmanEncoder = new HuffmanEncoder();
+          huffmanEncoder.calculateFrequencies(pixelData);
+          huffmanEncoder.buildTree();
+          huffmanEncoder.generateCodes();
+          const encodedData = huffmanEncoder.encode(pixelData);
+
+          const compressionPercent = huffmanEncoder.calculateCompressionPercentage(pixelData, encodedData);
+          compressionPercentage.textContent = `Compression Percentage: ${compressionPercent}%`;
+
+          compressionFill.style.width = `${compressionPercent}%`;
+          compressionSuccess.textContent = 'Successfully Compressed!';
+        };
+
+        image.src = event.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('compress-button').addEventListener('click', compressImage);
+  </script>
+</body>
+
+</html>
