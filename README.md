@@ -2,7 +2,7 @@
 Welcome to our compression website, where you can compress your files without losing any data. We specialize in lossless compression, ensuring that your files are compressed while retaining their original format and content.
 
 ## How does it work
-With our compression technique, you can reduce the size of your files without sacrificing any data. Whether you have image files or text files, our website provides the functionality to compress both types effectively.
+With our compression technique, you can reduce the size of your files without sacrificing any data. Whether you have image files or text files, our website provides the functionality to compress both types effectively.To visit the website use the welcome.html file.
 
 ## Lossless Compression
 Unlike other compression methods that may compromise the quality or integrity of your files, our lossless compression algorithm maintains the exact data of your files throughout the compression process. This means that you can confidently compress your files while preserving their content and structure.
